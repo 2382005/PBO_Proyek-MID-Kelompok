@@ -93,3 +93,153 @@ public class SistemAbsensiAsrama {
         monitorAccounts.put("Samuel", "BarudakWELL");
     }
 }
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+// Kelas non-publik Acara
+class Acara {
+    private String tanggal;
+    private String nama;
+    private String deskripsi;
+
+    // Konstruktor untuk menginisialisasi objek Acara
+    public Acara(String tanggal, String nama, String deskripsi) {
+        this.tanggal = tanggal;
+        this.nama = nama;
+        this.deskripsi = deskripsi;
+    }
+
+    // Metode getter untuk mendapatkan tanggal acara
+    public String getTanggal() {
+        return tanggal;
+    }
+
+    // Metode getter untuk mendapatkan nama acara
+    public String getNama() {
+        return nama;
+    }
+
+    // Metode getter untuk mendapatkan deskripsi acara
+    public String getDeskripsi() {
+        return deskripsi;
+    }
+}
+
+// Kelas publik DaftarAcara
+public class DaftarAcara {
+    private List<Acara> acaraList;
+    private Scanner scanner;
+
+    // Konstruktor
+    public DaftarAcara() {
+        acaraList = new ArrayList<>();
+        scanner = new Scanner(System.in);
+    }
+
+    // Metode untuk memasukkan acara
+    public void tambahAcara() {
+        System.out.println("=== Tambah Acara Baru ===");
+
+        String tanggal;
+        while (true) {
+            System.out.print("Masukkan Tanggal (YYYY-MM-DD): ");
+            tanggal = scanner.nextLine().trim();
+            if (isValidDate(tanggal)) {
+                break;
+            } else {
+                System.out.println("Format tanggal salah. Silakan coba lagi.");
+            }
+        }
+
+        String nama;
+        while (true) {
+            System.out.print("Masukkan Nama Acara: ");
+            nama = scanner.nextLine().trim();
+            if (!nama.isEmpty()) {
+                break;
+            } else {
+                System.out.println("Nama acara tidak boleh kosong. Silakan coba lagi.");
+            }
+        }
+
+        String deskripsi;
+        while (true) {
+            System.out.print("Masukkan Deskripsi Acara: ");
+            deskripsi = scanner.nextLine().trim();
+            if (!deskripsi.isEmpty()) {
+                break;
+            } else {
+                System.out.println("Deskripsi acara tidak boleh kosong. Silakan coba lagi.");
+            }
+        }
+
+        Acara acara = new Acara(tanggal, nama, deskripsi);
+        acaraList.add(acara);
+
+        System.out.println("Acara berhasil ditambahkan!\n");
+    }
+
+    // Metode untuk menampilkan semua acara dalam bentuk tabel
+    public void tampilkanAcara() {
+        if (acaraList.isEmpty()) {
+            System.out.println("Tidak ada acara yang tersedia.\n");
+            return;
+        }
+
+        System.out.printf("%-15s %-30s %-50s%n", "Tanggal", "Nama Acara", "Deskripsi");
+        System.out.println("-----------------------------------------------------------------------------------------------");
+
+        for (Acara acara : acaraList) {
+            System.out.printf("%-15s %-30s %-50s%n", acara.getTanggal(), acara.getNama(), acara.getDeskripsi());
+        }
+        System.out.println();
+    }
+
+    // Metode untuk memeriksa validitas format tanggal (YYYY-MM-DD)
+    public boolean isValidDate(String tanggal) {
+        return tanggal.matches("\\d{4}-\\d{2}-\\d{2}");
+    }
+
+    // Metode utama untuk menjalankan program
+    public void run() {
+        System.out.println("=== Program Daftar Acara ===\n");
+
+        boolean exit = false;
+        while (!exit) {
+            System.out.println("Pilih opsi:");
+            System.out.println("1. Tambah Acara");
+            System.out.println("2. Tampilkan Daftar Acara");
+            System.out.println("3. Keluar");
+            System.out.print("Masukkan pilihan (1-3): ");
+
+            String pilihan = scanner.nextLine().trim();
+            System.out.println();
+
+            switch (pilihan) {
+                case "1":
+                    tambahAcara();
+                    break;
+                case "2":
+                    tampilkanAcara();
+                    break;
+                case "3":
+                    exit = true;
+                    System.out.println("Terima kasih! Program selesai.");
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi.\n");
+            }
+        }
+
+        scanner.close();
+    }
+
+    // Metode main untuk menjalankan program
+    public static void main(String[] args) {
+        DaftarAcara daftarAcara = new DaftarAcara();
+        daftarAcara.run();
+    }
+}
+
