@@ -1,5 +1,57 @@
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+class Acara {
+    String namaAcara;
+    String tanggal;
+    String jamMulai;
+    String jamSelesai;
+    String pembuatAcara;
+
+    public Acara(String namaAcara, String tanggal, String jamMulai, String jamSelesai, String pembuatAcara) {
+        this.namaAcara = namaAcara;
+        this.tanggal = tanggal;
+        this.jamMulai = jamMulai;
+        this.jamSelesai = jamSelesai;
+        this.pembuatAcara = pembuatAcara;
+    }
+
+    public String getNamaAcara() {
+        return namaAcara;
+    }
+
+    public String getTanggal() {
+        return tanggal;
+    }
+
+    public void setTanggal(String tanggal) {
+        this.tanggal = tanggal;
+    }
+
+    public String getJamMulai() {
+        return jamMulai;
+    }
+
+    public void setJamMulai(String jamMulai) {
+        this.jamMulai = jamMulai;
+    }
+
+    public String getJamSelesai() {
+        return jamSelesai;
+    }
+
+    public void setJamSelesai(String jamSelesai) {
+        this.jamSelesai = jamSelesai;
+    }
+
+    @Override
+    public String toString() {
+        return "Nama Acara: " + namaAcara + ", Tanggal: " + tanggal + ", Jam Mulai: " + jamMulai + ", Jam Selesai: " + jamSelesai + ", Pembuat Acara: " + pembuatAcara;
+    }
+}
 
 public class SistemAbsensiAsrama {
 
@@ -7,6 +59,8 @@ public class SistemAbsensiAsrama {
     private static HashMap<String, String> monitorAccounts = new HashMap<>();
     // Data pemberitahuan harian yang dibuat oleh monitris/monitor
     private static String dailyNotification = "";
+    private static ArrayList<Acara> daftarAcara = new ArrayList<>(); // Daftar acara untuk penyimpanan acara
+    private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         // Inisialisasi akun para monitor dan monitris
@@ -18,7 +72,6 @@ public class SistemAbsensiAsrama {
         System.out.println("========================================");
 
         // Sistem login
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Masukkan Username: ");
         String username = scanner.nextLine();
         System.out.print("Masukkan Password: ");
@@ -27,11 +80,82 @@ public class SistemAbsensiAsrama {
         // Jika username dan password cocok dengan akun monitor/monitris
         if (isMonitorAccount(username, password)) {
             System.out.println(username + " Area");
-            showMonitorMenu(scanner, username);
+            showMonitorMenu(username);
         } else {
             // Jika username dan password tidak cocok, anggap sebagai penghuni biasa
             System.out.println("Selamat datang, Penghuni Asrama!");
             showResidentMenu();
+        }
+    }
+
+    // Method untuk memasukkan acara
+    public static void inputAcara() {
+        System.out.print("Masukkan Nama Acara: ");
+        String namaAcara = scanner.nextLine();
+        System.out.print("Masukkan Tanggal (dd/MM/yyyy): ");
+        String tanggal = scanner.nextLine();
+        System.out.print("Masukkan Jam Mulai (HH:mm): ");
+        String jamMulai = scanner.nextLine();
+        System.out.print("Masukkan Jam Selesai (HH:mm): ");
+        String jamSelesai = scanner.nextLine();
+        System.out.print("Masukkan Nama Pembuat Acara: ");
+        String pembuatAcara = scanner.nextLine();
+
+        Acara acaraBaru = new Acara(namaAcara, tanggal, jamMulai, jamSelesai, pembuatAcara);
+        daftarAcara.add(acaraBaru);
+        System.out.println("Acara berhasil ditambahkan!\n");
+    }
+
+    // Method untuk mengedit acara yang sudah ada
+    public static void editAcara() {
+        System.out.print("Masukkan Nama Acara yang ingin diedit: ");
+        String namaAcara = scanner.nextLine();
+
+        for (Acara acara : daftarAcara) {
+            if (acara.getNamaAcara().equalsIgnoreCase(namaAcara)) {
+                System.out.print("Masukkan Tanggal Baru (dd/MM/yyyy): ");
+                acara.setTanggal(scanner.nextLine());
+                System.out.print("Masukkan Jam Mulai Baru (HH:mm): ");
+                acara.setJamMulai(scanner.nextLine());
+                System.out.print("Masukkan Jam Selesai Baru (HH:mm): ");
+                acara.setJamSelesai(scanner.nextLine());
+                System.out.println("Acara berhasil diedit!\n");
+                return;
+            }
+        }
+        System.out.println("Acara tidak ditemukan!\n");
+    }
+
+    // Method untuk menghapus acara
+    public static void hapusAcara() {
+        System.out.print("Masukkan Nama Acara yang ingin dihapus: ");
+        String namaAcara = scanner.nextLine();
+
+        for (int i = 0; i < daftarAcara.size(); i++) {
+            if (daftarAcara.get(i).getNamaAcara().equalsIgnoreCase(namaAcara)) {
+                daftarAcara.remove(i);
+                System.out.println("Acara berhasil dihapus!\n");
+                return;
+            }
+        }
+        System.out.println("Acara tidak ditemukan!\n");
+    }
+
+    // Method untuk menampilkan dan menyortir acara
+    public static void tampilkanAcara() {
+        if (daftarAcara.isEmpty()) {
+            System.out.println("Tidak ada acara yang terdaftar.");
+        } else {
+            Collections.sort(daftarAcara, new Comparator<Acara>() {
+                @Override
+                public int compare(Acara a1, Acara a2) {
+                    return a1.getTanggal().compareTo(a2.getTanggal());
+                }
+            });
+
+            for (Acara acara : daftarAcara) {
+                System.out.println(acara);
+            }
         }
     }
 
@@ -41,12 +165,16 @@ public class SistemAbsensiAsrama {
     }
 
     // Menampilkan menu untuk monitris/monitor
-    private static void showMonitorMenu(Scanner scanner, String username) {
+    private static void showMonitorMenu(String username) {
         int choice = -1;
         while (choice != 0) {
             System.out.println("\n==== Dashboard Monitris/Monitor ====");
             System.out.println("1. Buat Pemberitahuan Harian");
             System.out.println("2. Lihat Catatan Monitris/Monitor");
+            System.out.println("3. Buat Acara Baru");
+            System.out.println("4. Edit Acara");
+            System.out.println("5. Hapus Acara");
+            System.out.println("6. Lihat Acara");
             System.out.println("0. Keluar");
             System.out.print("Pilih: ");
             choice = scanner.nextInt();
@@ -61,6 +189,18 @@ public class SistemAbsensiAsrama {
                 case 2:
                     System.out.println("Catatan Monitris/Monitor: ");
                     System.out.println(dailyNotification.isEmpty() ? "Belum ada catatan." : dailyNotification);
+                    break;
+                case 3:
+                    inputAcara();
+                    break;
+                case 4:
+                    editAcara();
+                    break;
+                case 5:
+                    hapusAcara();
+                    break;
+                case 6:
+                    tampilkanAcara();
                     break;
                 case 0:
                     System.out.println("Keluar dari sistem.");
@@ -93,153 +233,3 @@ public class SistemAbsensiAsrama {
         monitorAccounts.put("Samuel", "BarudakWELL");
     }
 }
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
-// Kelas non-publik Acara
-class Acara {
-    private String tanggal;
-    private String nama;
-    private String deskripsi;
-
-    // Konstruktor untuk menginisialisasi objek Acara
-    public Acara(String tanggal, String nama, String deskripsi) {
-        this.tanggal = tanggal;
-        this.nama = nama;
-        this.deskripsi = deskripsi;
-    }
-
-    // Metode getter untuk mendapatkan tanggal acara
-    public String getTanggal() {
-        return tanggal;
-    }
-
-    // Metode getter untuk mendapatkan nama acara
-    public String getNama() {
-        return nama;
-    }
-
-    // Metode getter untuk mendapatkan deskripsi acara
-    public String getDeskripsi() {
-        return deskripsi;
-    }
-}
-
-// Kelas publik DaftarAcara
-public class DaftarAcara {
-    private List<Acara> acaraList;
-    private Scanner scanner;
-
-    // Konstruktor
-    public DaftarAcara() {
-        acaraList = new ArrayList<>();
-        scanner = new Scanner(System.in);
-    }
-
-    // Metode untuk memasukkan acara
-    public void tambahAcara() {
-        System.out.println("=== Tambah Acara Baru ===");
-
-        String tanggal;
-        while (true) {
-            System.out.print("Masukkan Tanggal (YYYY-MM-DD): ");
-            tanggal = scanner.nextLine().trim();
-            if (isValidDate(tanggal)) {
-                break;
-            } else {
-                System.out.println("Format tanggal salah. Silakan coba lagi.");
-            }
-        }
-
-        String nama;
-        while (true) {
-            System.out.print("Masukkan Nama Acara: ");
-            nama = scanner.nextLine().trim();
-            if (!nama.isEmpty()) {
-                break;
-            } else {
-                System.out.println("Nama acara tidak boleh kosong. Silakan coba lagi.");
-            }
-        }
-
-        String deskripsi;
-        while (true) {
-            System.out.print("Masukkan Deskripsi Acara: ");
-            deskripsi = scanner.nextLine().trim();
-            if (!deskripsi.isEmpty()) {
-                break;
-            } else {
-                System.out.println("Deskripsi acara tidak boleh kosong. Silakan coba lagi.");
-            }
-        }
-
-        Acara acara = new Acara(tanggal, nama, deskripsi);
-        acaraList.add(acara);
-
-        System.out.println("Acara berhasil ditambahkan!\n");
-    }
-
-    // Metode untuk menampilkan semua acara dalam bentuk tabel
-    public void tampilkanAcara() {
-        if (acaraList.isEmpty()) {
-            System.out.println("Tidak ada acara yang tersedia.\n");
-            return;
-        }
-
-        System.out.printf("%-15s %-30s %-50s%n", "Tanggal", "Nama Acara", "Deskripsi");
-        System.out.println("-----------------------------------------------------------------------------------------------");
-
-        for (Acara acara : acaraList) {
-            System.out.printf("%-15s %-30s %-50s%n", acara.getTanggal(), acara.getNama(), acara.getDeskripsi());
-        }
-        System.out.println();
-    }
-
-    // Metode untuk memeriksa validitas format tanggal (YYYY-MM-DD)
-    public boolean isValidDate(String tanggal) {
-        return tanggal.matches("\\d{4}-\\d{2}-\\d{2}");
-    }
-
-    // Metode utama untuk menjalankan program
-    public void run() {
-        System.out.println("=== Program Daftar Acara ===\n");
-
-        boolean exit = false;
-        while (!exit) {
-            System.out.println("Pilih opsi:");
-            System.out.println("1. Tambah Acara");
-            System.out.println("2. Tampilkan Daftar Acara");
-            System.out.println("3. Keluar");
-            System.out.print("Masukkan pilihan (1-3): ");
-
-            String pilihan = scanner.nextLine().trim();
-            System.out.println();
-
-            switch (pilihan) {
-                case "1":
-                    tambahAcara();
-                    break;
-                case "2":
-                    tampilkanAcara();
-                    break;
-                case "3":
-                    exit = true;
-                    System.out.println("Terima kasih! Program selesai.");
-                    break;
-                default:
-                    System.out.println("Pilihan tidak valid. Silakan coba lagi.\n");
-            }
-        }
-
-        scanner.close();
-    }
-
-    // Metode main untuk menjalankan program
-    public static void main(String[] args) {
-        DaftarAcara daftarAcara = new DaftarAcara();
-        daftarAcara.run();
-    }
-}
-
