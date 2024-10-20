@@ -66,6 +66,9 @@ public class SistemAbsensiAsrama {
         // Inisialisasi akun para monitor dan monitris
         initializeMonitorAccounts();
 
+        // Inisialisasi poin penghuni asrama
+        initializePenghuniPoints();
+
         // Menampilkan judul aplikasi
         System.out.println("========================================");
         System.out.println(" Inovasi Sistem Absensi untuk Penghuni Asrama");
@@ -84,7 +87,7 @@ public class SistemAbsensiAsrama {
         } else {
             // Jika username dan password tidak cocok, anggap sebagai penghuni biasa
             System.out.println("Selamat datang, Penghuni Asrama!");
-            showResidentMenu();
+            showResidentMenu(password);
         }
     }
 
@@ -164,6 +167,32 @@ public class SistemAbsensiAsrama {
         return monitorAccounts.containsKey(username) && monitorAccounts.get(username).equals(password);
     }
 
+    private static HashMap<String, Integer> penghuniPoints = new HashMap<>();
+
+    private static void initializePenghuniPoints() {
+        penghuniPoints.put("Penghuni1", 100);
+        penghuniPoints.put("Penghuni2", 90);
+        penghuniPoints.put("Penghuni3", 85);
+        // Tambahkan penghuni lainnya sesuai kebutuhan
+    }
+
+    // Menampilkan poin penghuni
+    public static void tampilkanPoinPenghuni(String username) {
+        if (penghuniPoints.containsKey(username)) {
+            System.out.println("Poin Anda: " + penghuniPoints.get(username));
+        } else {
+            System.out.println("Penghuni tidak ditemukan.");
+        }
+    }
+
+    // Method untuk menampilkan rangkuman poin seluruh penghuni (untuk monitor)
+    public static void tampilkanRangkumanPoin() {
+        System.out.println("Rangkuman Poin Seluruh Penghuni:");
+        for (String penghuni : penghuniPoints.keySet()) {
+            System.out.println(penghuni + ": " + penghuniPoints.get(penghuni) + " poin");
+        }
+    }
+
     // Menampilkan menu untuk monitris/monitor
     private static void showMonitorMenu(String username) {
         int choice = -1;
@@ -175,6 +204,7 @@ public class SistemAbsensiAsrama {
             System.out.println("4. Edit Acara");
             System.out.println("5. Hapus Acara");
             System.out.println("6. Lihat Acara");
+            System.out.println("7. Lihat Rangkuman Poin Penghuni");
             System.out.println("0. Keluar");
             System.out.print("Pilih: ");
             choice = scanner.nextInt();
@@ -202,6 +232,8 @@ public class SistemAbsensiAsrama {
                 case 6:
                     tampilkanAcara();
                     break;
+                case 7:
+                    tampilkanRangkumanPoin();
                 case 0:
                     System.out.println("Keluar dari sistem.");
                     break;
@@ -213,12 +245,34 @@ public class SistemAbsensiAsrama {
     }
 
     // Menampilkan menu untuk penghuni asrama biasa
-    private static void showResidentMenu() {
-        System.out.println("\n==== Dashboard Penghuni Asrama ====");
-        System.out.println("Fitur yang bisa diakses oleh penghuni asrama: ");
-        System.out.println("1. Lihat Catatan Monitris/Monitor");
-        System.out.println("2. Logout");
-        System.out.println("Fitur lainnya akan dikembangkan lebih lanjut.");
+    private static void showResidentMenu(String username) {
+        int choice = -1;
+        while (choice != 0) {
+            System.out.println("\n==== Dashboard Penghuni Asrama ====");
+            System.out.println("1. Lihat Catatan Monitris/Monitor");
+            System.out.println("2. Lihat Poin Kehadiran");
+            System.out.println("3. Logout");
+            System.out.print("Pilih: ");
+            choice = scanner.nextInt();
+            scanner.nextLine();  // membersihkan buffer
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Catatan Monitris: ");
+                    System.out.println(dailyNotification.isEmpty() ? "Belum ada catatan." : dailyNotification);
+                    break;
+                case 2:
+                    tampilkanPoinPenghuni(username);
+                    break;
+                case 3:
+                    System.out.println("Logout berhasil.");
+                    choice = 0; // keluar dari sistem
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid.");
+                    break;
+            }
+        }
     }
 
     // Inisialisasi akun monitor dan monitris
