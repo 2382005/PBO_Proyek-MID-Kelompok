@@ -3,6 +3,10 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 class Acara {
     String namaAcara;
@@ -61,6 +65,10 @@ public class SistemAbsensiAsrama {
     private static String dailyNotification = "";
     private static ArrayList<Acara> daftarAcara = new ArrayList<>(); // Daftar acara untuk penyimpanan acara
     private static Scanner scanner = new Scanner(System.in);
+    private static ArrayList<String> daftarHadir = new ArrayList<>();
+    private static ArrayList<String> daftarTidakHadir = new ArrayList<>();
+    private static ArrayList<IzinTidakHadir> daftarIzinTidakHadir = new ArrayList<>();
+
 
     public static void main(String[] args) {
         // Inisialisasi akun para monitor dan monitris
@@ -234,6 +242,21 @@ public class SistemAbsensiAsrama {
                     break;
                 case 7:
                     tampilkanRangkumanPoin();
+                case 8:
+                    absensi();
+                    break;
+                case 9:
+                    tampilkanDaftarHadir();
+                    break;
+                case 10:
+                    tampilkanDaftarTidakHadir();
+                    break;
+                case 11:
+                    izinTidakHadir();
+                    break;
+                case 12:
+                    tampilkanIzinTidakHadir();
+                    break;
                 case 0:
                     System.out.println("Keluar dari sistem.");
                     break;
@@ -285,5 +308,88 @@ public class SistemAbsensiAsrama {
         monitorAccounts.put("Daniel", "PecintaUnai");
         monitorAccounts.put("Joseph", "BrokoliMbaFin");
         monitorAccounts.put("Samuel", "BarudakWELL");
+    }
+
+    // Method untuk mengelola absensi
+    public static void absensi() {
+        System.out.println("Masukkan daftar hadir:");
+        String namaHadir = scanner.nextLine();
+        daftarHadir.add(namaHadir);
+
+        System.out.println("Masukkan daftar tidak hadir:");
+        String namaTidakHadir = scanner.nextLine();
+        daftarTidakHadir.add(namaTidakHadir);
+
+        System.out.println("Absensi telah dicatat.\n");
+    }
+
+    // Method untuk menampilkan daftar hadir
+    public static void tampilkanDaftarHadir() {
+        System.out.println("Masukkan Nama Asrama: ");
+        String namaAsrama = scanner.nextLine();
+
+        System.out.println("Daftar Hadir untuk Asrama " + namaAsrama + ":");
+        for (String nama : daftarHadir) {
+            System.out.println(nama);
+        }
+    }
+
+    // Method untuk menampilkan daftar tidak hadir
+    public static void tampilkanDaftarTidakHadir() {
+        System.out.println("Masukkan Nama Asrama: ");
+        String namaAsrama = scanner.nextLine();
+
+        System.out.println("Daftar Tidak Hadir untuk Asrama " + namaAsrama + ":");
+        for (String nama : daftarTidakHadir) {
+            System.out.println(nama);
+        }
+    }
+
+    // Kelas untuk mengelola izin tidak hadir
+    static class IzinTidakHadir {
+        String nama;
+        String namaAsrama;
+        String tanggal;
+        String namaAcara;
+        String alasan;
+
+        public IzinTidakHadir(String nama, String namaAsrama, String tanggal, String namaAcara, String alasan) {
+            this.nama = nama;
+            this.namaAsrama = namaAsrama;
+            this.tanggal = tanggal;
+            this.namaAcara = namaAcara;
+            this.alasan = alasan;
+        }
+
+        @Override
+        public String toString() {
+            return "Nama: " + nama + ", Asrama: " + namaAsrama + ", Tanggal: " + tanggal + ", Acara: " + namaAcara + ", Alasan: " + alasan;
+        }
+    }
+
+    // Method untuk pengelolaan izin tidak hadir
+    public static void izinTidakHadir() {
+        System.out.print("Masukkan Nama: ");
+        String nama = scanner.nextLine();
+        System.out.print("Masukkan Nama Asrama: ");
+        String namaAsrama = scanner.nextLine();
+        System.out.print("Masukkan Tanggal (dd/MM/yyyy): ");
+        String tanggal = scanner.nextLine();
+        System.out.print("Masukkan Nama Acara: ");
+        String namaAcara = scanner.nextLine();
+        System.out.print("Masukkan Alasan: ");
+        String alasan = scanner.nextLine();
+
+        IzinTidakHadir izin = new IzinTidakHadir(nama, namaAsrama, tanggal, namaAcara, alasan);
+        daftarIzinTidakHadir.add(izin);
+        System.out.println("Izin tidak hadir telah dicatat.\n");
+    }
+
+    // Method untuk menampilkan izin tidak hadir
+    public static void tampilkanIzinTidakHadir() {
+        System.out.println("Daftar Izin Tidak Hadir:");
+        for (IzinTidakHadir izin : daftarIzinTidakHadir) {
+            System.out.println(izin);
+        }
     }
 }
