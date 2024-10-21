@@ -3,10 +3,6 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 
 class Acara {
     String namaAcara;
@@ -59,22 +55,20 @@ class Acara {
 
 public class SistemAbsensiAsrama {
 
-    // Data username dan password untuk para monitor dan monitris
     private static HashMap<String, String> monitorAccounts = new HashMap<>();
-    // Data pemberitahuan harian yang dibuat oleh monitris/monitor
     private static String dailyNotification = "";
-    private static ArrayList<Acara> daftarAcara = new ArrayList<>(); // Daftar acara untuk penyimpanan acara
+    private static ArrayList<Acara> daftarAcara = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
-    private static ArrayList<String> daftarHadir = new ArrayList<>();
-    private static ArrayList<String> daftarTidakHadir = new ArrayList<>();
+    private static HashMap<String, ArrayList<String>> daftarHadir = new HashMap<>();
+    private static HashMap<String, ArrayList<String>> daftarTidakHadir = new HashMap<>();
     private static ArrayList<IzinTidakHadir> daftarIzinTidakHadir = new ArrayList<>();
+    private static HashMap<String, Integer> penghuniPoints = new HashMap<>();
+    private static ArrayList<Feedback> feedbackList = new ArrayList<>();
 
 
     public static void main(String[] args) {
-        // Inisialisasi akun para monitor dan monitris
+        // Inisialisasi akun para monitor
         initializeMonitorAccounts();
-
-        // Inisialisasi poin penghuni asrama
         initializePenghuniPoints();
 
         // Menampilkan judul aplikasi
@@ -88,19 +82,16 @@ public class SistemAbsensiAsrama {
         System.out.print("Masukkan Password: ");
         String password = scanner.nextLine();
 
-        // Jika username dan password cocok dengan akun monitor/monitris
         if (isMonitorAccount(username, password)) {
             System.out.println(username + " Area");
             showMonitorMenu(username);
         } else {
-            // Jika username dan password tidak cocok, anggap sebagai penghuni biasa
             System.out.println("Selamat datang, Penghuni Asrama!");
-            showResidentMenu(password);
+            showResidentMenu(username);
         }
     }
 
-    // Method untuk memasukkan acara
-    public static void inputAcara() {
+    private static void inputAcara() {
         System.out.print("Masukkan Nama Acara: ");
         String namaAcara = scanner.nextLine();
         System.out.print("Masukkan Tanggal (dd/MM/yyyy): ");
@@ -117,8 +108,7 @@ public class SistemAbsensiAsrama {
         System.out.println("Acara berhasil ditambahkan!\n");
     }
 
-    // Method untuk mengedit acara yang sudah ada
-    public static void editAcara() {
+    private static void editAcara() {
         System.out.print("Masukkan Nama Acara yang ingin diedit: ");
         String namaAcara = scanner.nextLine();
 
@@ -137,8 +127,7 @@ public class SistemAbsensiAsrama {
         System.out.println("Acara tidak ditemukan!\n");
     }
 
-    // Method untuk menghapus acara
-    public static void hapusAcara() {
+    private static void hapusAcara() {
         System.out.print("Masukkan Nama Acara yang ingin dihapus: ");
         String namaAcara = scanner.nextLine();
 
@@ -152,8 +141,7 @@ public class SistemAbsensiAsrama {
         System.out.println("Acara tidak ditemukan!\n");
     }
 
-    // Method untuk menampilkan dan menyortir acara
-    public static void tampilkanAcara() {
+    private static void tampilkanAcara() {
         if (daftarAcara.isEmpty()) {
             System.out.println("Tidak ada acara yang terdaftar.");
         } else {
@@ -170,22 +158,44 @@ public class SistemAbsensiAsrama {
         }
     }
 
-    // Memeriksa apakah login untuk monitris/monitor
+    private static void submitFeedback(String username) {
+        System.out.print("Masukkan feedback Anda: ");
+        String content = scanner.nextLine();
+        Feedback feedback = new Feedback(username, content);
+        feedbackList.add(feedback);
+        System.out.println("Feedback Anda telah dikirim.\n");
+    }
+
+    private static void displayFeedback() {
+        System.out.println("Daftar Feedback:");
+        if (feedbackList.isEmpty()) {
+            System.out.println("Belum ada feedback yang diberikan.");
+        } else {
+            for (Feedback feedback : feedbackList) {
+                System.out.println(feedback);
+            }
+        }
+    }
+
+
     private static boolean isMonitorAccount(String username, String password) {
         return monitorAccounts.containsKey(username) && monitorAccounts.get(username).equals(password);
     }
-
-    private static HashMap<String, Integer> penghuniPoints = new HashMap<>();
 
     private static void initializePenghuniPoints() {
         penghuniPoints.put("Penghuni1", 100);
         penghuniPoints.put("Penghuni2", 90);
         penghuniPoints.put("Penghuni3", 85);
-        // Tambahkan penghuni lainnya sesuai kebutuhan
     }
 
-    // Menampilkan poin penghuni
-    public static void tampilkanPoinPenghuni(String username) {
+    private static void tampilkanPoinPenghuni(String username) {
+        System.out.println("Ketentuan Poin:");
+        System.out.println("Ibadah Chapel: -100 Point");
+        System.out.println("Ibadah NDG: -70 Point");
+        System.out.println("Acara Girls Club: -50 Point");
+        System.out.println("Acara PA: -70 Point");
+        System.out.println("Kegiatan lainnya tergantung keputusan kepala asrama.\n");
+
         if (penghuniPoints.containsKey(username)) {
             System.out.println("Poin Anda: " + penghuniPoints.get(username));
         } else {
@@ -193,15 +203,13 @@ public class SistemAbsensiAsrama {
         }
     }
 
-    // Method untuk menampilkan rangkuman poin seluruh penghuni (untuk monitor)
-    public static void tampilkanRangkumanPoin() {
+    private static void tampilkanRangkumanPoin() {
         System.out.println("Rangkuman Poin Seluruh Penghuni:");
         for (String penghuni : penghuniPoints.keySet()) {
             System.out.println(penghuni + ": " + penghuniPoints.get(penghuni) + " poin");
         }
     }
 
-    // Menampilkan menu untuk monitris/monitor
     private static void showMonitorMenu(String username) {
         int choice = -1;
         while (choice != 0) {
@@ -213,6 +221,13 @@ public class SistemAbsensiAsrama {
             System.out.println("5. Hapus Acara");
             System.out.println("6. Lihat Acara");
             System.out.println("7. Lihat Rangkuman Poin Penghuni");
+            System.out.println("8. Absensi");
+            System.out.println("9. Lihat Daftar Hadir");
+            System.out.println("10. Lihat Daftar Tidak Hadir");
+            System.out.println("11. Izin Tidak Hadir");
+            System.out.println("12. Lihat Izin Tidak Hadir");
+            System.out.println("13. Lihat Feedback");
+            System.out.println("14. Kirim Feedback");
             System.out.println("0. Keluar");
             System.out.print("Pilih: ");
             choice = scanner.nextInt();
@@ -242,8 +257,9 @@ public class SistemAbsensiAsrama {
                     break;
                 case 7:
                     tampilkanRangkumanPoin();
+                    break;
                 case 8:
-                    absensi();
+                    absensi(username);
                     break;
                 case 9:
                     tampilkanDaftarHadir();
@@ -257,6 +273,12 @@ public class SistemAbsensiAsrama {
                 case 12:
                     tampilkanIzinTidakHadir();
                     break;
+                case 13:
+                    displayFeedback();
+                    break;
+                case 14:
+                    submitFeedback(username);
+                    break;
                 case 0:
                     System.out.println("Keluar dari sistem.");
                     break;
@@ -267,14 +289,25 @@ public class SistemAbsensiAsrama {
         }
     }
 
-    // Menampilkan menu untuk penghuni asrama biasa
     private static void showResidentMenu(String username) {
         int choice = -1;
         while (choice != 0) {
             System.out.println("\n==== Dashboard Penghuni Asrama ====");
             System.out.println("1. Lihat Catatan Monitris/Monitor");
-            System.out.println("2. Lihat Poin Kehadiran");
-            System.out.println("3. Logout");
+            System.out.println("2. Lihat Acara");
+            System.out.println("3. Kirim Feedback"); // Added feedback option
+            System.out.println("4. Ketentuan Poin");
+            System.out.println("5. Izin Tidak Hadir");
+            System.out.println("6. Buat Pemberitahuan Harian");
+            System.out.println("7. Buat Acara Baru");
+            System.out.println("8. Edit Acara");
+            System.out.println("9. Hapus Acara");
+            System.out.println("10. Lihat Rangkuman Poin Penghuni");
+            System.out.println("11. Absensi");
+            System.out.println("12. Lihat Daftar Hadir");
+            System.out.println("13. Lihat Daftar Tidak Hadir");
+            System.out.println("14. Lihat Izin Tidak Hadir");
+            System.out.println("0. Logout");
             System.out.print("Pilih: ");
             choice = scanner.nextInt();
             scanner.nextLine();  // membersihkan buffer
@@ -285,9 +318,31 @@ public class SistemAbsensiAsrama {
                     System.out.println(dailyNotification.isEmpty() ? "Belum ada catatan." : dailyNotification);
                     break;
                 case 2:
+                    tampilkanAcara();
+                    break;
+                case 3: // Handle feedback submission
+                    submitFeedback(username);
+                    break;
+                case 4:
                     tampilkanPoinPenghuni(username);
                     break;
-                case 3:
+                case 5:
+                    izinTidakHadir();
+                    break;
+                // Menangani fitur yang tidak diizinkan
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                    System.out.println("Maaf, anda bukan Monitris/Monitor. Anda tidak memiliki akses ke fitur ini.");
+                    break;
+                case 13:
+                    tampilkanIzinTidakHadir();
+                    break;
+                case 0:
                     System.out.println("Logout berhasil.");
                     choice = 0; // keluar dari sistem
                     break;
@@ -298,7 +353,8 @@ public class SistemAbsensiAsrama {
         }
     }
 
-    // Inisialisasi akun monitor dan monitris
+
+
     private static void initializeMonitorAccounts() {
         monitorAccounts.put("Ester Hall", "ehWELL");
         monitorAccounts.put("Ester Extension Hall", "EEHWARR");
@@ -310,42 +366,72 @@ public class SistemAbsensiAsrama {
         monitorAccounts.put("Samuel", "BarudakWELL");
     }
 
-    // Method untuk mengelola absensi
-    public static void absensi() {
-        System.out.println("Masukkan daftar hadir:");
-        String namaHadir = scanner.nextLine();
-        daftarHadir.add(namaHadir);
+    public static void absensi(String username) {
+        System.out.println("Masukkan daftar hadir (pisahkan dengan koma):");
+        String[] hadir = scanner.nextLine().split(",");
+        if (!daftarHadir.containsKey(username)) {
+            daftarHadir.put(username, new ArrayList<>());
+        }
+        for (String nama : hadir) {
+            daftarHadir.get(username).add(nama.trim());
+        }
 
-        System.out.println("Masukkan daftar tidak hadir:");
-        String namaTidakHadir = scanner.nextLine();
-        daftarTidakHadir.add(namaTidakHadir);
+        System.out.println("Masukkan daftar tidak hadir (pisahkan dengan koma):");
+        String[] tidakHadir = scanner.nextLine().split(",");
+        if (!daftarTidakHadir.containsKey(username)) {
+            daftarTidakHadir.put(username, new ArrayList<>());
+        }
+        for (String nama : tidakHadir) {
+            daftarTidakHadir.get(username).add(nama.trim());
+        }
 
         System.out.println("Absensi telah dicatat.\n");
     }
 
-    // Method untuk menampilkan daftar hadir
     public static void tampilkanDaftarHadir() {
-        System.out.println("Masukkan Nama Asrama: ");
-        String namaAsrama = scanner.nextLine();
-
-        System.out.println("Daftar Hadir untuk Asrama " + namaAsrama + ":");
-        for (String nama : daftarHadir) {
-            System.out.println(nama);
+        System.out.print("Masukkan nama asrama untuk melihat daftar hadir: ");
+        String asrama = scanner.nextLine();
+        System.out.println("Daftar Hadir untuk Asrama " + asrama + ":");
+        ArrayList<String> hadir = daftarHadir.get(asrama);
+        if (hadir != null && !hadir.isEmpty()) {
+            for (String nama : hadir) {
+                System.out.println(nama);
+            }
+        } else {
+            System.out.println("Tidak ada nama yang hadir.");
         }
     }
 
-    // Method untuk menampilkan daftar tidak hadir
     public static void tampilkanDaftarTidakHadir() {
-        System.out.println("Masukkan Nama Asrama: ");
-        String namaAsrama = scanner.nextLine();
-
-        System.out.println("Daftar Tidak Hadir untuk Asrama " + namaAsrama + ":");
-        for (String nama : daftarTidakHadir) {
-            System.out.println(nama);
+        System.out.print("Masukkan nama asrama untuk melihat daftar tidak hadir: ");
+        String asrama = scanner.nextLine();
+        System.out.println("Daftar Tidak Hadir untuk Asrama " + asrama + ":");
+        ArrayList<String> tidakHadir = daftarTidakHadir.get(asrama);
+        if (tidakHadir != null && !tidakHadir.isEmpty()) {
+            for (String nama : tidakHadir) {
+                System.out.println(nama);
+            }
+        } else {
+            System.out.println("Tidak ada nama yang tidak hadir.");
         }
     }
 
-    // Kelas untuk mengelola izin tidak hadir
+    static class Feedback {
+        String username;
+        String content;
+
+        public Feedback(String username, String content) {
+            this.username = username;
+            this.content = content;
+        }
+
+        @Override
+        public String toString() {
+            return "Penghuni: " + username + ", Feedback: " + content;
+        }
+    }
+
+
     static class IzinTidakHadir {
         String nama;
         String namaAsrama;
@@ -367,7 +453,6 @@ public class SistemAbsensiAsrama {
         }
     }
 
-    // Method untuk pengelolaan izin tidak hadir
     public static void izinTidakHadir() {
         System.out.print("Masukkan Nama: ");
         String nama = scanner.nextLine();
@@ -385,11 +470,16 @@ public class SistemAbsensiAsrama {
         System.out.println("Izin tidak hadir telah dicatat.\n");
     }
 
-    // Method untuk menampilkan izin tidak hadir
     public static void tampilkanIzinTidakHadir() {
         System.out.println("Daftar Izin Tidak Hadir:");
         for (IzinTidakHadir izin : daftarIzinTidakHadir) {
             System.out.println(izin);
+        }
+
+        // Menampilkan alasan untuk yang tidak hadir
+        System.out.println("\nLihat Alasan:");
+        for (IzinTidakHadir izin : daftarIzinTidakHadir) {
+            System.out.println(izin.nama + " tidak hadir, alasan: " + izin.alasan);
         }
     }
 }
